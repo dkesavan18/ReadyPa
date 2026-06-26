@@ -1,0 +1,155 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Hotel {
+  id            String   @id @default(cuid())
+  name          String
+  ownerName     String
+  mobile        String   @unique
+  password      String
+  address       String
+  mapLocation   String?
+  category      String
+  openTime      String
+  closeTime     String
+  logoUrl       String?
+  coverUrl      String?
+  upiId         String?
+  upiQrUrl      String?
+  isActive      Boolean  @default(false)
+  rating        Float    @default(0)
+  totalRatings  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  categories    Category[]
+  products      Product[]
+  orders        Order[]
+
+  @@map("hotels")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  hotelId   String
+  hotel     Hotel     @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  products  Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  price        Float
+  imageUrl     String?
+  isAvailable  Boolean  @default(true)
+  isVeg        Boolean  @default(true)
+  categoryId   String
+  category     Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  hotelId      String
+  hotel        Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orderItems   OrderItem[]
+
+  @@map("products")
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  mobile    String
+  pushToken String?
+  createdAt DateTime @default(now())
+
+  orders    Order[]
+
+  @@map("customers")
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  customerId      String
+  customer        Customer    @relation(fields: [customerId], references: [id])
+  hotelId         String
+  hotel           Hotel       @relation(fields: [hotelId], references: [id])
+  status          OrderStatus @default(PENDING)
+  pickupTime      String
+  notes           String?
+  totalAmount     Float
+  paymentStatus   PaymentStatus @default(UNPAID)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items           OrderItem[]
+  notifications   Notification[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+  name      String
+
+  @@map("order_items")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  orderId   String
+  order     Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String
+  sentAt    DateTime         @default(now())
+  isRead    Boolean          @default(false)
+
+  @@map("notifications")
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  WAITING_FOR_PAYMENT
+  PAYMENT_SUBMITTED
+  PAYMENT_VERIFIED
+  PREPARING
+  READY
+  COLLECTED
+  REJECTED
+}
+
+enum PaymentStatus {
+  UNPAID
+  SUBMITTED
+  VERIFIED
+  FAILED
+}
+
+enum NotificationType {
+  ORDER_ACCEPTED
+  PAYMENT_VERIFIED
+  PREPARING
+  ORDER_READY
+  ORDER_REJECTED
+}
