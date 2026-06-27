@@ -192,7 +192,7 @@ export default function OrderStatusPage() {
                 Collected {formatOrderNumber(order.orderNumber)}. Thank you for using{" "}
                 <span className="font-poetsen">
                   <span className="text-brand-ready">Ready</span>
-                  <span className="text-brand-pa">Pa</span>
+                  <span className="text-brand-pa">Zo</span>
                 </span>
               </>
             )}
