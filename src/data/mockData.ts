@@ -102,6 +102,23 @@ export const mockHotels: Hotel[] = [
     totalRatings: 112,
     createdAt: "2024-03-10T10:00:00Z",
   },
+  {
+    id: "hotel-7",
+    name: "Pradhap Chicken Center",
+    ownerName: "Pradhap",
+    mobile: "9876512347",
+    address: "Main Road, Elampillai, Salem, Tamil Nadu - 637502",
+    category: "Restaurant",
+    openTime: "08:00",
+    closeTime: "22:00",
+    logoUrl: "https://images.unsplash.com/photo-1604503468506-a8da45d8369b?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=800&h=400&fit=crop",
+    upiId: "pradhapchicken@upi",
+    isActive: true,
+    rating: 4.7,
+    totalRatings: 94,
+    createdAt: "2024-06-01T10:00:00Z",
+  },
 ];
 
 export const mockCategories: Category[] = [
@@ -127,6 +144,10 @@ export const mockCategories: Category[] = [
 
   { id: "cat-16", name: "Fresh Juices", hotelId: "hotel-6", sortOrder: 1 },
   { id: "cat-17", name: "Milkshakes", hotelId: "hotel-6", sortOrder: 2 },
+
+  { id: "cat-18", name: "Fried Rice", hotelId: "hotel-7", sortOrder: 1 },
+  { id: "cat-19", name: "Chicken 65", hotelId: "hotel-7", sortOrder: 2 },
+  { id: "cat-20", name: "Fresh Chicken", hotelId: "hotel-7", sortOrder: 3 },
 ];
 
 export const mockProducts: Product[] = [
@@ -473,6 +494,89 @@ export const mockProducts: Product[] = [
     isVeg: true,
     categoryId: "cat-17",
     hotelId: "hotel-6",
+  },
+
+  // Pradhap Chicken Center — Fried Rice
+  {
+    id: "prod-31",
+    name: "Egg Fried Rice",
+    description: "Hot egg fried rice — full plate",
+    price: 70,
+    imageUrl: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&h=300&fit=crop",
+    isAvailable: true,
+    isVeg: false,
+    categoryId: "cat-18",
+    hotelId: "hotel-7",
+  },
+  {
+    id: "prod-32",
+    name: "Chicken Fried Rice",
+    description: "Chicken fried rice — full plate",
+    price: 90,
+    imageUrl: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop",
+    isAvailable: true,
+    isVeg: false,
+    categoryId: "cat-18",
+    hotelId: "hotel-7",
+  },
+
+  // Pradhap Chicken Center — Chicken 65 (by weight)
+  {
+    id: "prod-33",
+    name: "Chicken 65 — 120g",
+    description: "Crispy chicken 65 — ₹50 for 120 grams",
+    price: 50,
+    imageUrl: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400&h=300&fit=crop",
+    isAvailable: true,
+    isVeg: false,
+    categoryId: "cat-19",
+    hotelId: "hotel-7",
+  },
+  {
+    id: "prod-34",
+    name: "Chicken 65 — 220g",
+    description: "Crispy chicken 65 — ₹100 for 220 grams",
+    price: 100,
+    imageUrl: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400&h=300&fit=crop",
+    isAvailable: true,
+    isVeg: false,
+    categoryId: "cat-19",
+    hotelId: "hotel-7",
+  },
+  {
+    id: "prod-35",
+    name: "Chicken 65 — 250g",
+    description: "Crispy chicken 65 — ₹120 for 250 grams",
+    price: 120,
+    imageUrl: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400&h=300&fit=crop",
+    isAvailable: true,
+    isVeg: false,
+    categoryId: "cat-19",
+    hotelId: "hotel-7",
+  },
+
+  // Pradhap Chicken Center — Fresh Chicken
+  {
+    id: "prod-36",
+    name: "Live Chicken",
+    description: "Fresh live chicken — price per 1 kg (weight at shop)",
+    price: 95,
+    imageUrl: "https://images.unsplash.com/photo-1604503468506-a8da45d8369b?w=400&h=300&fit=crop",
+    isAvailable: true,
+    isVeg: false,
+    categoryId: "cat-20",
+    hotelId: "hotel-7",
+  },
+  {
+    id: "prod-37",
+    name: "Urudan Kozhi (Cut Chicken)",
+    description: "Cleaned & cut chicken — ₹120 per 1 kg",
+    price: 120,
+    imageUrl: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400&h=300&fit=crop",
+    isAvailable: true,
+    isVeg: false,
+    categoryId: "cat-20",
+    hotelId: "hotel-7",
   },
 ];
 

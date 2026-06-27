@@ -7,6 +7,7 @@ export const LOCATIONS = [
   { id: "thanjavur", label: "Thanjavur" },
   { id: "pollachi", label: "Pollachi" },
   { id: "salem", label: "Salem" },
+  { id: "elampillai", label: "Elampillai" },
   { id: "erode", label: "Erode" },
 ] as const;
 
@@ -21,7 +22,7 @@ export function getCityFromAddress(address: string): string {
 
 export function hotelMatchesLocation(address: string, locationId: string): boolean {
   if (locationId === ALL_LOCATIONS_ID) return true;
-  const city = getCityFromAddress(address).toLowerCase();
   const location = LOCATIONS.find((l) => l.id === locationId);
-  return location ? city === location.label.toLowerCase() : true;
+  if (!location) return true;
+  return address.toLowerCase().includes(location.label.toLowerCase());
 }
