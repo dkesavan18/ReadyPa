@@ -111,7 +111,7 @@ export default function HotelDashboardPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-primary-200 text-sm font-medium">Today's Revenue</p>
+              <p className="text-primary-200 text-sm font-medium">Today&apos;s Revenue</p>
               <p className="text-3xl font-black mt-1">{formatCurrency(todayRevenue)}</p>
               <p className="text-primary-200 text-xs mt-1">
                 {todayOrders.length} orders today

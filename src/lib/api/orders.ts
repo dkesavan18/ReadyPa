@@ -1,4 +1,5 @@
 import type { Order, OrderStatus } from "@/types";
+import type { OrderPatch } from "@/types";
 
 export async function fetchOrders(): Promise<Order[]> {
   const res = await fetch("/api/orders", { cache: "no-store" });
@@ -16,15 +17,22 @@ export async function postOrder(order: Order): Promise<Order> {
   return res.json();
 }
 
-export async function patchOrderStatus(
+export async function patchOrder(
   orderId: string,
-  status: OrderStatus
+  patch: OrderPatch
 ): Promise<Order> {
   const res = await fetch(`/api/orders/${orderId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(patch),
   });
   if (!res.ok) throw new Error("Failed to update order");
   return res.json();
+}
+
+export async function patchOrderStatus(
+  orderId: string,
+  status: OrderStatus
+): Promise<Order> {
+  return patchOrder(orderId, { status });
 }

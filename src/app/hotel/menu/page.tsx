@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, BottomSheet } from "@/components/ui/dialog";
+import { BottomSheet } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, generateId } from "@/lib/utils";
 import { useHotelStore } from "@/store/hotelStore";
@@ -138,17 +138,21 @@ export default function MenuManagementPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-6">
       {/* Header */}
-      <div className="bg-white sticky top-0 z-20 shadow-soft px-4 py-4 flex items-center gap-3">
-        <Link href="/hotel/dashboard" className="h-9 w-9 rounded-full hover:bg-gray-100 flex items-center justify-center">
-          <ChevronLeft className="h-5 w-5" />
-        </Link>
-        <h1 className="text-lg font-black text-gray-900 flex-1">Menu Management</h1>
-        <div className="flex gap-2">
+      <div className="bg-white sticky top-0 z-20 shadow-soft">
+        <div className="px-4 py-3 flex items-center gap-3">
+          <Link href="/hotel/dashboard" className="h-9 w-9 rounded-full hover:bg-gray-100 flex items-center justify-center flex-shrink-0">
+            <ChevronLeft className="h-5 w-5" />
+          </Link>
+          <h1 className="text-lg font-black text-gray-900 flex-1 min-w-0">Menu</h1>
+        </div>
+
+        <div className="px-4 pb-3 flex gap-2">
           <Button
             variant="outline"
             size="sm"
+            className="flex-1"
             onClick={() => {
               setEditingCategory(null);
               setCategoryName("");
@@ -157,15 +161,14 @@ export default function MenuManagementPage() {
           >
             <FolderPlus className="h-4 w-4" /> Category
           </Button>
-          <Button size="sm" onClick={openAddProduct}>
+          <Button size="sm" className="flex-1" onClick={openAddProduct}>
             <Plus className="h-4 w-4" /> Product
           </Button>
         </div>
-      </div>
 
-      {/* Category Tabs */}
-      <div className="bg-white border-b border-gray-100 sticky top-16 z-10">
-        <div className="flex gap-1 px-3 py-3 overflow-x-auto scrollbar-hide">
+        {/* Category Tabs */}
+        <div className="border-t border-gray-100">
+          <div className="flex gap-1 px-3 py-3 overflow-x-auto overflow-y-hidden scrollbar-hide">
           <button
             onClick={() => setActiveCategory(null)}
             className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
@@ -207,6 +210,7 @@ export default function MenuManagementPage() {
               </div>
             );
           })}
+          </div>
         </div>
       </div>
 
@@ -290,8 +294,8 @@ export default function MenuManagementPage() {
         )}
       </div>
 
-      {/* Category Dialog */}
-      <Dialog
+      {/* Category Sheet */}
+      <BottomSheet
         open={showCategoryDialog}
         onClose={() => setShowCategoryDialog(false)}
         title={editingCategory ? "Edit Category" : "Add Category"}
@@ -313,9 +317,9 @@ export default function MenuManagementPage() {
             </Button>
           </div>
         </div>
-      </Dialog>
+      </BottomSheet>
 
-      {/* Product BottomSheet */}
+      {/* Product Sheet */}
       <BottomSheet
         open={showProductSheet}
         onClose={() => setShowProductSheet(false)}

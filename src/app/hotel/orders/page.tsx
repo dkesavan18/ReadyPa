@@ -48,7 +48,7 @@ function OrdersContent() {
 
       {/* Tabs */}
       <div className="bg-white border-b border-gray-100">
-        <div className="flex gap-1 px-3 py-2.5 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-1 px-3 py-2.5 overflow-x-auto overflow-y-hidden scrollbar-hide">
           {FILTER_TABS.map((tab) => (
             <button
               key={tab.value}

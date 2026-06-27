@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -12,24 +12,45 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { OrderStatusBadge } from "@/components/shared/OrderStatusBadge";
-import { formatCurrency, getRelativeTime } from "@/lib/utils";
+import { formatCurrency, formatOrderNumber, getRelativeTime } from "@/lib/utils";
 import { useOrderStore } from "@/store/orderStore";
 import { useHotelStore } from "@/store/hotelStore";
+import { OrderLoading } from "@/components/shared/OrderLoading";
+import { ReasonSheet } from "@/components/hotel/ReasonSheet";
+import {
+  buildOrderRejectPresets,
+  PAYMENT_REJECT_PRESETS,
+} from "@/data/rejectReasons";
 import toast from "react-hot-toast";
+
+type ReasonFlow = "reject" | "payment_reject" | null;
 
 export default function HotelOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
-  const { getOrderById, updateOrderStatus } = useOrderStore();
+  const { getOrderById, updateOrderStatus, updateOrder, syncOrders, isSyncing } = useOrderStore();
   const { loggedInHotel, updateHotel } = useHotelStore();
 
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [reasonFlow, setReasonFlow] = useState<ReasonFlow>(null);
   const [upiId, setUpiId] = useState(loggedInHotel?.upiId || "");
   const [isSaving, setIsSaving] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [initialSyncDone, setInitialSyncDone] = useState(false);
+  const syncAttempted = useRef(false);
 
   const order = getOrderById(id);
+
+  useEffect(() => {
+    if (syncAttempted.current) return;
+    syncAttempted.current = true;
+    syncOrders().finally(() => setInitialSyncDone(true));
+  }, [syncOrders]);
+
+  if (!order && (!initialSyncDone || isSyncing)) {
+    return <OrderLoading />;
+  }
 
   if (!order) {
     return (
@@ -56,7 +77,7 @@ export default function HotelOrderDetailPage() {
   const doAccept = async () => {
     setIsUpdating(true);
     await new Promise((r) => setTimeout(r, 600));
-    await updateOrderStatus(order.id, "ACCEPTED");
+    await updateOrderStatus(order.id, "WAITING_FOR_PAYMENT");
     toast.success("Order accepted!");
     setIsUpdating(false);
   };
@@ -80,18 +101,12 @@ export default function HotelOrderDetailPage() {
     setIsUpdating(true);
     await new Promise((r) => setTimeout(r, 500));
     switch (action) {
-      case "reject":
-        await updateOrderStatus(order.id, "REJECTED");
-        toast.error("Order rejected");
-        router.push("/hotel/orders");
-        break;
       case "payment_received":
-        await updateOrderStatus(order.id, "PAYMENT_VERIFIED");
+        await updateOrder(order.id, {
+          status: "PAYMENT_VERIFIED",
+          paymentRejectReason: null,
+        });
         toast.success("Payment verified!");
-        break;
-      case "payment_not_received":
-        await updateOrderStatus(order.id, "WAITING_FOR_PAYMENT");
-        toast.error("Payment not received. Customer notified.");
         break;
       case "preparing":
         await updateOrderStatus(order.id, "PREPARING");
@@ -99,15 +114,51 @@ export default function HotelOrderDetailPage() {
         break;
       case "ready":
         await updateOrderStatus(order.id, "READY");
-        toast.success("Order is ready for pickup!");
+        toast.success(
+          order.orderNumber != null
+            ? `${formatOrderNumber(order.orderNumber)} ready — ${order.customerName}`
+            : `Order ready for ${order.customerName}`
+        );
         break;
       case "complete":
         await updateOrderStatus(order.id, "COLLECTED");
-        toast.success("Order completed!");
+        toast.success(
+          order.orderNumber != null
+            ? `${formatOrderNumber(order.orderNumber)} collected — ${order.customerName}`
+            : `Order collected by ${order.customerName}`
+        );
         break;
     }
     setIsUpdating(false);
   };
+
+  const handleReasonConfirm = async (reason: string) => {
+    setIsUpdating(true);
+    try {
+      if (reasonFlow === "reject") {
+        await updateOrder(order.id, { status: "REJECTED", rejectReason: reason });
+        toast.error("Order rejected");
+        setReasonFlow(null);
+        router.push("/hotel/orders");
+      } else if (reasonFlow === "payment_reject") {
+        await updateOrder(order.id, {
+          status: "WAITING_FOR_PAYMENT",
+          paymentRejectReason: reason,
+        });
+        toast.error("Customer notified about payment");
+        setReasonFlow(null);
+      }
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const reasonPresets =
+    reasonFlow === "reject"
+      ? buildOrderRejectPresets(order.items)
+      : reasonFlow === "payment_reject"
+      ? PAYMENT_REJECT_PRESETS
+      : [];
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -118,7 +169,11 @@ export default function HotelOrderDetailPage() {
         </Link>
         <div className="flex-1">
           <h1 className="text-base font-black text-gray-900">Order Details</h1>
-          <p className="text-xs text-gray-500">#{order.id.slice(-8).toUpperCase()}</p>
+          <p className="text-xs text-gray-500">
+            {order.orderNumber != null
+              ? formatOrderNumber(order.orderNumber)
+              : `#${order.id.slice(-8).toUpperCase()}`}
+          </p>
         </div>
         <OrderStatusBadge status={order.status} />
       </div>
@@ -126,6 +181,17 @@ export default function HotelOrderDetailPage() {
       <div className="px-4 py-5 space-y-4">
         {/* Customer Info */}
         <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-5">
+          {order.status === "READY" && order.orderNumber != null && (
+            <div className="mb-4 rounded-xl bg-green-50 border border-green-200 px-3 py-3 text-center">
+              <p className="text-xs text-green-700">
+                Order number is{" "}
+                <span className="text-2xl font-black text-green-800 tabular-nums">
+                  {formatOrderNumber(order.orderNumber)}
+                </span>
+              </p>
+              <p className="text-[11px] text-green-600 mt-1">Write on parcel — {order.customerName}</p>
+            </div>
+          )}
           <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
             <span className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-lg">👤</span>
             Customer Details
@@ -187,6 +253,21 @@ export default function HotelOrderDetailPage() {
           </div>
         </div>
 
+        {/* Waiting for Payment */}
+        {(order.status === "WAITING_FOR_PAYMENT" || order.status === "ACCEPTED") && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-orange-50 rounded-2xl border border-orange-200 p-5 text-center"
+          >
+            <Clock className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+            <h3 className="font-bold text-orange-900">Waiting for Customer Payment</h3>
+            <p className="text-sm text-orange-700 mt-1">
+              Customer will pay via UPI and confirm. You will be notified when payment is submitted.
+            </p>
+          </motion.div>
+        )}
+
         {/* Payment Submitted Alert */}
         {order.status === "PAYMENT_SUBMITTED" && (
           <motion.div
@@ -218,7 +299,7 @@ export default function HotelOrderDetailPage() {
               </Button>
               <Button
                 variant="destructive"
-                onClick={() => handleAction("payment_not_received")}
+                onClick={() => setReasonFlow("payment_reject")}
                 loading={isUpdating}
                 className="text-sm"
               >
@@ -249,7 +330,7 @@ export default function HotelOrderDetailPage() {
               <Button
                 variant="destructive"
                 className="flex-1"
-                onClick={() => handleAction("reject")}
+                onClick={() => setReasonFlow("reject")}
                 loading={isUpdating}
               >
                 <XCircle className="h-4 w-4" /> Reject
@@ -326,6 +407,17 @@ export default function HotelOrderDetailPage() {
           )}
         </AnimatePresence>
       </div>
+
+      <ReasonSheet
+        open={reasonFlow !== null}
+        onClose={() => setReasonFlow(null)}
+        title={reasonFlow === "reject" ? "Reject order" : "Payment not received"}
+        description="Pick a message or write your own. The customer will see this."
+        presets={reasonPresets}
+        confirmLabel={reasonFlow === "reject" ? "Reject order" : "Notify customer"}
+        loading={isUpdating}
+        onConfirm={handleReasonConfirm}
+      />
 
       {/* Payment Required Dialog */}
       <Dialog

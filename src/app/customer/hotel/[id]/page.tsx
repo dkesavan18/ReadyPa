@@ -41,7 +41,7 @@ export default function HotelDetailsPage() {
         <div className="text-center">
           <span className="text-5xl">🏨</span>
           <p className="text-gray-500 mt-4">Hotel not found</p>
-          <Link href="/customer" className="text-primary font-semibold mt-2 block">
+          <Link href="/customer/home" className="text-primary font-semibold mt-2 block">
             Go back
           </Link>
         </div>
@@ -69,7 +69,7 @@ export default function HotelDetailsPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
         <Link
-          href="/customer"
+          href="/customer/home"
           className="absolute top-4 left-4 h-9 w-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-md"
         >
           <ChevronLeft className="h-5 w-5 text-gray-700" />
@@ -131,7 +131,7 @@ export default function HotelDetailsPage() {
       {/* Category Tabs */}
       {categories.length > 0 && (
         <div className="bg-white sticky top-16 z-20 border-b border-gray-100">
-          <div className="flex gap-1 px-4 py-3 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-1 px-4 py-3 overflow-x-auto overflow-y-hidden scrollbar-hide">
             <button
               onClick={() => setActiveCategory(null)}
               className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${

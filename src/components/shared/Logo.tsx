@@ -13,7 +13,7 @@ interface LogoProps {
 
 export function Logo({
   showText = true,
-  textSize = 20,
+  textSize = 24,
   iconWidth = 30,
   iconHeight = 27,
   href,
@@ -23,7 +23,7 @@ export function Logo({
     <div className={cn("flex items-center gap-2", className)}>
       <Image
         src="/logo.svg"
-        alt="ReadyPa"
+        alt="ReadyZo"
         width={iconWidth}
         height={iconHeight}
         priority
@@ -35,7 +35,7 @@ export function Logo({
           style={{ fontSize: textSize }}
         >
           <span className="text-brand-ready">Ready</span>
-          <span className="text-brand-pa">Pa</span>
+          <span className="text-brand-pa">Zo</span>
         </span>
       )}
     </div>
@@ -64,7 +64,7 @@ export function LogoMark({
   return (
     <Image
       src="/logo.svg"
-      alt="ReadyPa"
+      alt="ReadyZo"
       width={width}
       height={height}
       className={cn("flex-shrink-0", className)}

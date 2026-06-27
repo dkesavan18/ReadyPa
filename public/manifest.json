@@ -1,6 +1,6 @@
 {
-  "name": "ReadyPa – Order Food Before You Arrive",
-  "short_name": "ReadyPa",
+  "name": "ReadyZo – Order Food Before You Arrive",
+  "short_name": "ReadyZo",
   "description": "Order food from nearby hotels before reaching. Skip the wait.",
   "start_url": "/",
   "display": "standalone",

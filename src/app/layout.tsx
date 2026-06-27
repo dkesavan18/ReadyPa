@@ -4,17 +4,17 @@ import { ToastProvider } from "@/components/ui/toast";
 import { StoreHydration } from "@/components/shared/StoreHydration";
 
 export const metadata: Metadata = {
-  title: "ReadyPa – Order Food Before You Arrive",
+  title: "ReadyZo – Order Food Before You Arrive",
   description:
     "Order food from nearby hotels before reaching. Skip the wait. Pick up fresh.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "ReadyPa",
+    title: "ReadyZo",
   },
   openGraph: {
-    title: "ReadyPa",
+    title: "ReadyZo",
     description: "Order food before you arrive. Skip the wait.",
     type: "website",
   },

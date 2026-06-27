@@ -69,8 +69,15 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface OrderPatch {
+  status?: OrderStatus;
+  rejectReason?: string | null;
+  paymentRejectReason?: string | null;
+}
+
 export interface Order {
   id: string;
+  orderNumber?: number;
   customerId: string;
   customerName: string;
   customerMobile: string;
@@ -82,6 +89,8 @@ export interface Order {
   totalAmount: number;
   paymentStatus: PaymentStatus;
   items: OrderItem[];
+  rejectReason?: string;
+  paymentRejectReason?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -36,6 +36,17 @@ export function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
+export const ORDER_NUMBER_START = 100;
+
+export function formatOrderNumber(orderNumber: number): string {
+  return `#${orderNumber}`;
+}
+
+export function getOrderDisplayNumber(order: { orderNumber?: number; id: string }): string {
+  if (order.orderNumber != null) return formatOrderNumber(order.orderNumber);
+  return `#${order.id.slice(-4).toUpperCase()}`;
+}
+
 export function getRelativeTime(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();

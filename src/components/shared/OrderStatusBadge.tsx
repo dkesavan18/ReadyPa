@@ -8,6 +8,8 @@ interface OrderStatusBadgeProps {
 }
 
 export function OrderStatusBadge({ status, className }: OrderStatusBadgeProps) {
+  const isTerminal = status === "COLLECTED" || status === "REJECTED";
+
   return (
     <span
       className={cn(
@@ -16,7 +18,12 @@ export function OrderStatusBadge({ status, className }: OrderStatusBadgeProps) {
         className
       )}
     >
-      <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
+      <span
+        className={cn(
+          "h-1.5 w-1.5 rounded-full bg-current",
+          !isTerminal && "animate-pulse"
+        )}
+      />
       {ORDER_STATUS_LABELS[status]}
     </span>
   );

@@ -1,8 +1,8 @@
-# ReadyPa 🍛
+# ReadyZo 🍛
 
 > **Order food before you arrive. Skip the wait.**
 
-ReadyPa is a mobile-first Progressive Web App (PWA) for rural and small-town hotels in India. Customers can pre-order food from nearby hotels and pick it up when they arrive — no waiting.
+ReadyZo is a mobile-first Progressive Web App (PWA) for rural and small-town hotels in India. Customers can pre-order food from nearby hotels and pick it up when they arrive — no waiting.
 
 ## Tech Stack
 

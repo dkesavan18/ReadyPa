@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/store/cartStore";
 import { useOrderStore } from "@/store/orderStore";
-import { formatCurrency, generateId, PICKUP_TIMES } from "@/lib/utils";
+import { formatCurrency, formatOrderNumber, generateId, PICKUP_TIMES } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 export default function CartPage() {
@@ -44,38 +44,46 @@ export default function CartPage() {
     if (!validate()) return;
 
     setIsPlacing(true);
-    await new Promise((r) => setTimeout(r, 1000));
+    try {
+      const orderId = `order-${generateId()}`;
+      const totalAmount = getTotalAmount();
 
-    const orderId = `order-${generateId()}`;
-    const totalAmount = getTotalAmount();
+      const created = await addOrder({
+        id: orderId,
+        customerId: `cust-${generateId()}`,
+        customerName: customerName.trim(),
+        customerMobile: customerMobile.trim(),
+        hotelId: hotelId!,
+        hotelName: hotelName!,
+        status: "PENDING",
+        pickupTime,
+        notes: notes || undefined,
+        totalAmount,
+        paymentStatus: "UNPAID",
+        items: items.map((i, idx) => ({
+          id: `item-${generateId()}-${idx}`,
+          orderId,
+          productId: i.product.id,
+          productName: i.product.name,
+          quantity: i.quantity,
+          price: i.product.price,
+        })),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
 
-    await addOrder({
-      id: orderId,
-      customerId: `cust-${generateId()}`,
-      customerName: customerName.trim(),
-      customerMobile: customerMobile.trim(),
-      hotelId: hotelId!,
-      hotelName: hotelName!,
-      status: "PENDING",
-      pickupTime,
-      notes: notes || undefined,
-      totalAmount,
-      paymentStatus: "UNPAID",
-      items: items.map((i, idx) => ({
-        id: `item-${generateId()}-${idx}`,
-        orderId,
-        productId: i.product.id,
-        productName: i.product.name,
-        quantity: i.quantity,
-        price: i.product.price,
-      })),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
-
-    clearCart();
-    toast.success("Order placed successfully!");
-    router.push(`/customer/order/${orderId}`);
+      clearCart();
+      toast.success(
+        created.orderNumber != null
+          ? `Order ${formatOrderNumber(created.orderNumber)} placed successfully!`
+          : "Order placed successfully!"
+      );
+      router.push(`/customer/order/${created.id}`);
+    } catch {
+      toast.error("Could not place order. Please try again.");
+    } finally {
+      setIsPlacing(false);
+    }
   };
 
   if (items.length === 0) {
@@ -91,7 +99,7 @@ export default function CartPage() {
           </div>
           <h2 className="text-2xl font-black text-gray-900">Cart is empty</h2>
           <p className="text-gray-500 mt-2 text-sm">Add items from a nearby hotel</p>
-          <Link href="/customer">
+          <Link href="/customer/home">
             <Button className="mt-6">Browse Hotels</Button>
           </Link>
         </motion.div>

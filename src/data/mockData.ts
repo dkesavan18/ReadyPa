@@ -479,6 +479,7 @@ export const mockProducts: Product[] = [
 export const mockOrders: Order[] = [
   {
     id: "order-1",
+    orderNumber: 100,
     customerId: "cust-1",
     customerName: "Ravi Kumar",
     customerMobile: "9876500001",
@@ -499,6 +500,7 @@ export const mockOrders: Order[] = [
   },
   {
     id: "order-2",
+    orderNumber: 101,
     customerId: "cust-2",
     customerName: "Priya S",
     customerMobile: "9876500002",
